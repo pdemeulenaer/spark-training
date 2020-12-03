@@ -1,6 +1,5 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC -sandbox
 # MAGIC 
 # MAGIC # Exercises
 # MAGIC 
@@ -642,3 +641,107 @@ df = spark.createDataFrame([(1, 4), (2, 8), (2, 6)], ["A", "B"])
 # COMMAND ----------
 
 df.selectExpr("A", "B", "A+B > 7 as high").show(5)
+
+# COMMAND ----------
+
+# Sort the dataframe on column B, descending order
+
+# COMMAND ----------
+
+from pyspark.sql.functions import col
+df.sort(col("B").desc()).show()
+
+# COMMAND ----------
+
+# now sort the df along col A in desc, and then along col B in ascending order
+
+# COMMAND ----------
+
+df.sort(col("A").desc(), col("B").asc()).show()
+
+# COMMAND ----------
+
+# You have such dataframe. Sort along B column in desc order, keeping NULL at the end
+df = spark.createDataFrame([(1, 4), (2, 8), (3, None), (2, 6)], ["A", "B"]) 
+
+# COMMAND ----------
+
+df.sort(col("B").desc_nulls_last()).show()
+
+# COMMAND ----------
+
+# filter the previous dataframe so that to keep column B without NULL
+
+# COMMAND ----------
+
+df.filter(col("B").isNotNull()).show()
+
+# COMMAND ----------
+
+# find the unique values in column A
+
+# COMMAND ----------
+
+df.select("A").distinct().show()
+
+# COMMAND ----------
+
+# Aggregations
+# Example: we have a given dataframe like
+df = spark.createDataFrame([(1, 4), (2, 5), (2, 8), (3, 6), (3, 2)], ["A", "B"])
+df.show()
+# Group by A and build the average of B, min of B, max of B
+
+# COMMAND ----------
+
+from pyspark.sql import functions as F
+df.groupBy("A").agg(F.avg("B"), F.min("B"), F.max("B")).show()
+
+# COMMAND ----------
+
+# group by column A and get the distinct number of rows in column B for each group. Then order by that quantity, descending
+
+# COMMAND ----------
+
+df.groupBy('A').agg(F.countDistinct('B').alias('countB')).orderBy('countB',ascending=False).show()
+
+# COMMAND ----------
+
+# now same, but using the approxmative distinct count function instead of the deterministic distinct count function distinctCount
+
+# COMMAND ----------
+
+df.groupBy('A').agg(F.approx_count_distinct('B').alias('countB')).orderBy('countB',ascending=False).show()
+
+# COMMAND ----------
+
+# group by A and get the first, last, and sum of colunm B. Rename these columns as "my first", "my last", "my everything"
+
+# COMMAND ----------
+
+df.groupBy("A").agg(
+  F.first("B").alias("my first"),
+  F.last("B").alias("my last"),
+  F.sum("B").alias("my everything")
+).show()
+
+# COMMAND ----------
+
+# You have such dataframe. Recreate columns A and B and limit them to 2 decimals
+df = spark.createDataFrame([(1.787, 4.3434), (2.5655, 8.67676), (2.23245, 6.676746)], ["A", "B"]) 
+
+# COMMAND ----------
+
+from pyspark.sql.functions import col, round
+df.withColumn("A", round(col("A"),2)).withColumn("B", round(col("B"),2)).show()
+
+# COMMAND ----------
+
+# cast the first column to "long" type
+
+# COMMAND ----------
+
+df.withColumn("A", col("A").cast("long")).show()
+
+# COMMAND ----------
+
