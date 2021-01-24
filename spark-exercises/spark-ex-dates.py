@@ -19,6 +19,7 @@ df = spark.createDataFrame([('2015-04-08',)], ['dt'])
 # +----------+----------+
 
 
+
 # Answer
 df.select("dt", F.date_add(df.dt, 1).alias('next_date')).show()
 
@@ -32,6 +33,8 @@ df = spark.createDataFrame([('2015-04-08',)], ['dt'])
 # +----------+
 # |04/08/2015|
 # +----------+
+
+
 
 # Answer
 df.select(F.date_format('dt', 'MM/dd/yyyy').alias('date')).show()
@@ -141,6 +144,7 @@ df = spark.createDataFrame([('2015-04-08 13:08:15',)], ['ts'])
 # +----+----+
 
 
+
 # Answer
 df.select(F.year('ts').alias('year'), F.hour('ts').alias('hour')).show()
 
@@ -243,6 +247,7 @@ df.select(F.add_months(df.dt, 1).alias('next_month')).show()
 # +--------------+-----------------------+
 # |2021-01-24    |2021-01-24 22:27:35.045|
 # +--------------+-----------------------+
+
 
 
 # Answer
@@ -348,6 +353,8 @@ df.show()
 # |2020-07-04|   2020-07-06|
 # |2020-07-04|   2020-07-06|
 # +----------+-------------+
+
+
 
 # Answer
 df = df.withColumn("date", F.to_date(F.col("ts")))
