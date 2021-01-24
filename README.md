@@ -9,4 +9,6 @@ Folder structure
 
 - spark-exercises/spark-ex-aggregations.py : general exercises on groupBy operations, window, cube and rollup functions
 
+- spark-exercises/spark-ex-dates.py : general exercises with dates/datetime
+
 
