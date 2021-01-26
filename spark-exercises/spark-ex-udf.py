@@ -428,3 +428,41 @@ def slen(s: pd.Series) -> pd.Series:
     return s.str.len()
 
 df.select(slen("name").alias("name")).show()
+
+# COMMAND ----------
+
+# You have this dataframe, and you are asked to round the arrays in the first column to 2 decimals
+df = spark.createDataFrame([([1.4343,2.3434,3.4545],'val1'),([4.5656,5.1215,6.5656],'val2')],['col1','col2'])
+# For this, use this function:
+# def round_func(v):
+#     return v.apply(lambda x:np.around(x,decimals=2))
+# Declare the pandas_udf decorator in pre-spark 3, as well as a second time using spark 3 convention
+
+# Expected:
+# +--------------------+----+------------------+
+# |                col1|col2|              col3|
+# +--------------------+----+------------------+
+# |[1.4343, 2.3434, ...|val1|[1.43, 2.34, 3.45]|
+# |[4.5656, 5.1215, ...|val2|[4.57, 5.12, 6.57]|
+# +--------------------+----+------------------+
+
+
+
+# Answer
+import numpy as np
+import pandas as pd
+from pyspark.sql.types import *
+
+# pre-spark 3
+@F.pandas_udf(ArrayType(FloatType()),F.PandasUDFType.SCALAR)
+def round_func(v):
+    return v.apply(lambda x:np.around(x,decimals=2))
+
+df.withColumn('col3',round_func(df.col1)).show()
+
+# starting from spark 3
+@F.pandas_udf(ArrayType(FloatType()))
+def round_func(v: pd.Series) -> pd.Series:
+    return v.apply(lambda x:np.around(x,decimals=2))
+
+df.withColumn('col3',round_func(df.col1)).show()
