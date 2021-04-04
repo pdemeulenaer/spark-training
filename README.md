@@ -11,4 +11,6 @@ Folder structure
 
 - spark-exercises/spark-ex-dates.py : general exercises with dates/datetime
 
+- spark-exercises/spark-ex-functions.py : Spark functions exercises
 
+- spark-exercises/spark-ex-udf.py: User Defined Functions exercises
